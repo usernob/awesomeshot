@@ -550,31 +550,33 @@ function version() {
   echo -e "awesomeshot v.${version}"
 }
 
-case "${1}" in
-  -a|--auto )
-    main autoRun
-  ;;
-  -c|--config )
-    generateDefaultConfig
-  ;;
-  -m|--manual )
-    if [ ${2} ]; then
-      file_name="${2}"
-      main manualRun
-    else
-      echo ""
-      stat "ERROR" "Danger" "This option require filename"
+while test $# -eq 0; then
+  case "${1}" in
+    -a|--auto )
+      main autoRun
+    ;;
+    -c|--config )
+      generateDefaultConfig
+    ;;
+    -m|--manual )
+      if [ ${2} ]; then
+        file_name="${2}"
+        main manualRun
+      else
+        echo ""
+        stat "ERROR" "Danger" "This option require filename"
+        help
+        exit 1
+      fi
+    ;;
+    -h|--help )
       help
-      exit 1
-    fi
-  ;;
-  -h|--help )
-    help
-  ;;
-  -v|--version )
-    version
-  ;;
-  *)
-    help
-  ;;
-esac
+    ;;
+    -v|--version )
+      version
+    ;;
+    *)
+      help
+    ;;
+  esac
+done 
