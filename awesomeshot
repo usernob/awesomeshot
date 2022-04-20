@@ -606,7 +606,7 @@ while test $# -gt 0; do
       shift
       titlebar_options=("--on-image" "--color" "--width" "--height")
       if test $# -gt 0; then
-        while [[ "${titlebar_options[@]}" ]]; do
+        while [[ "${titlebar_options[*]}" =~ $1 ]]; do
           if [[ $1 == "--on-image" ]]; then
             add_on_img="yes"
             shift
@@ -650,7 +650,7 @@ while test $# -gt 0; do
       shift
       border_options=("--color" "--size")
       if test $# -gt 0; then
-        while [[ "${border_options[@]}" =~ $1 ]]; do
+        while [[ "${border_options[*]}" =~ $1 ]]; do
           if [[ $1 == "--color" ]]; then
             border_color=$2
             shift 2
@@ -671,7 +671,7 @@ while test $# -gt 0; do
       shift
       shadow_options=("--color" "--size")
       if test $# -gt 0; then
-        while [[ "${shadow_options[@]}" =~ $1 ]]; do
+        while [[ "${shadow_options[*]}" =~ $1 ]]; do
           if [[ $1 == "--color" ]]; then
             shadow_color=$2
             shift 2
