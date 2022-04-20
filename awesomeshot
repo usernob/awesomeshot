@@ -733,13 +733,10 @@ while test $# -gt 0; do
     ;;
   esac
 done
-echo $backup
-echo $footer_position
-echo $footer_text
+
+
 if [[ $Mode == "auto" ]]; then
-  echo "auto"
-  #main autoRun
+  main autoRun
 elif [[ $Mode == "manual" ]]; then
-  echo "manual"
-  #main manualRun
+  main manualRun
 fi
