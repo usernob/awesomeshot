@@ -604,25 +604,28 @@ while test $# -gt 0; do
     ;;
     -t|--titlebar )
       shift
+      titlebar_options=("--on-image" "--color" "--width" "--height")
       if test $# -gt 0; then
-        if [[ $1 == "--on-image" ]]; then
-          add_on_img="yes"
-          shift
-        else 
-          add_on_img="no"
-        fi
-        if [[ $1 == "--color" ]]; then
-          titlebar_color=$2
-          shift 2
-        fi
-        if [[ $1 == "--width" ]]; then
-          width_img=$2
-          shift 2
-        fi
-        if [[ $1 == "--height" ]]; then
-          height_img=$2
-          shift 2
-        fi
+        while [[ "${titlebar_options[@]}" ]]; do
+          if [[ $1 == "--on-image" ]]; then
+            add_on_img="yes"
+            shift
+          else 
+            add_on_img="no"
+          fi
+          if [[ $1 == "--color" ]]; then
+            titlebar_color=$2
+            shift 2
+          fi
+          if [[ $1 == "--width" ]]; then
+            width_img=$2
+            shift 2
+          fi
+          if [[ $1 == "--height" ]]; then
+            height_img=$2
+            shift 2
+          fi
+        done
       fi
       convert_titlebar="yes"
     ;;
@@ -645,15 +648,18 @@ while test $# -gt 0; do
     ;;
     -d|--border )
       shift
+      border_options=("--color" "--size")
       if test $# -gt 0; then
-        if [[ $1 == "--color" ]]; then
-          border_color=$2
-          shift 2
-        fi
-        if [[ $1 == "--size" ]]; then
-          border_size=$2
-          shift 2
-        fi
+        while [[ "${border_options[@]}" =~ $1 ]]; do
+          if [[ $1 == "--color" ]]; then
+            border_color=$2
+            shift 2
+          fi
+          if [[ $1 == "--size" ]]; then
+            border_size=$2
+            shift 2
+          fi
+        done
       fi
       convert_border="yes"
     ;;  
@@ -663,11 +669,18 @@ while test $# -gt 0; do
     ;;
     -s|--shadow )
       shift
+      shadow_options=("--color" "--size")
       if test $# -gt 0; then
-        if [[ $1 == "--color" ]]; then
-          shadow_color=$2
-          shift 2
-        fi
+        while [[ "${shadow_options[@]}" =~ $1 ]]; do
+          if [[ $1 == "--color" ]]; then
+            shadow_color=$2
+            shift 2
+          fi
+          if [[ $1 == "--size" ]]; then
+            shadow_size=$2
+            shift 2
+          fi
+        done
       fi
       convert_shadow="yes"
     ;;
@@ -677,35 +690,38 @@ while test $# -gt 0; do
     ;;
     -f|--footer )
       shift
+      footer_options=("--text" "--font" "--position" "--xy" "--font-size" "--color" "--background")
       if test $# -gt 0; then
-        if [[ $1 == "--text" ]]; then
-          footer_text=$2
-          shift 2
-        fi
-        if [[ $1 == "--font" ]]; then
-          footer_font=$2
-          shift 2
-        fi
-        if [[ $1 == "--position" ]]; then
-          footer_position=$2
-          shift 2
-        fi
-        if [[ $1 == "--xy" ]]; then
-          footer_xy=$2
-          shift 2
-        fi
-        if [[ $1 == "--font-size" ]]; then
-          footer_font_size=$2
-          shift 2
-        fi
-        if [[ $1 == "--color" ]]; then
-          footer_foreground=$2
-          shift 2
-        fi
-        if [[ $1 == "--background" ]]; then
-          footer_background=$2
-          shift 2
-        fi
+        while [[ "${footer_options[*]}" =~ $1 ]]; do
+          if [[ $1 == "--text" ]]; then
+            footer_text=$2
+            shift 2
+          fi
+          if [[ $1 == "--font" ]]; then
+            footer_font=$2
+            shift 2
+          fi
+          if [[ $1 == "--position" ]]; then
+            footer_position=$2
+            shift 2
+          fi
+          if [[ $1 == "--xy" ]]; then
+            footer_xy=$2
+            shift 2
+          fi
+          if [[ $1 == "--font-size" ]]; then
+            footer_font_size=$2
+            shift 2
+          fi
+          if [[ $1 == "--color" ]]; then
+            footer_foreground=$2
+            shift 2
+          fi
+          if [[ $1 == "--background" ]]; then
+            footer_background=$2
+            shift 2
+          fi
+        done
       fi
     ;;
     *)
@@ -717,9 +733,13 @@ while test $# -gt 0; do
     ;;
   esac
 done
-
+echo $backup
+echo $footer_position
+echo $footer_text
 if [[ $Mode == "auto" ]]; then
-  main autoRun
+  echo "auto"
+  #main autoRun
 elif [[ $Mode == "manual" ]]; then
-  main manualRun
+  echo "manual"
+  #main manualRun
 fi
