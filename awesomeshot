@@ -240,6 +240,49 @@ function check() {
 
   fi
 }
+function run() {
+  if [ "${convert_to_png}" == "yes" ]; then
+    convertToPng
+  fi
+  
+  if [ "${backup}" == "yes" ]; then
+    title "${COLOR_SKY}[+] BACKUP IMAGE${COLOR_DEFAULT}"
+    backupOriginalPhoto "${file_name}"
+  fi
+  
+  title "${COLOR_SKY}[+] EDITING IMAGE${COLOR_DEFAULT}"
+    
+  if [ "${convert_titlebar}" == "yes" ]; then
+    convertTitleBar
+  fi
+  
+  if [ "${convert_rounded}" == "yes" ]; then
+    convertRounded
+  fi
+  
+  if [ "${convert_first_border}" == "yes" ]; then
+    convertFirstBorder
+    convertRounded
+  fi
+
+  if [ "${convert_shadow}" == "yes" ]; then
+    convertShadow
+  fi
+
+  if [ "${convert_second_border}" == "yes" ]; then
+    convertSecondBorder
+  fi
+
+  if [ "${convert_footer}" == "yes" ]; then
+    convertFooter
+  fi
+
+  termux-media-scan "${file_name}" &> /dev/null
+  termux-toast -b "${hex_color[0]}" -c "${hex_color[1]}" -g top "${file_name} ✅"
+  termux-notification --action "termux-open '${file_name}'" --icon "camera_enhance" \
+  --image-path "${file_name}" --priority "high" --title "📸 Awesomeshot v${version}"
+}
+
 
 function autoRun() {
   count=1
@@ -259,49 +302,7 @@ function autoRun() {
           file_name="${screenshot_result_path}/${get_file_name}"
         fi
 
-        echo -e ""
-
-        if [ "${convert_to_png}" == "yes" ]; then
-          convertToPng
-        fi
-
-        if [ "${backup}" == "yes" ]; then
-          title "${COLOR_SKY}[+] BACKUP IMAGE${COLOR_DEFAULT}"
-          backupOriginalPhoto "${get_file_name}"
-        fi
-
-        title "${COLOR_SKY}[+] EDITING IMAGE${COLOR_DEFAULT}"
-         
-        if [ "${convert_titlebar}" == "yes" ]; then
-          convertTitleBar
-        fi
-
-        if [ "${convert_rounded}" == "yes" ]; then
-          convertRounded
-        fi
-
-        if [ "${convert_first_border}" == "yes" ]; then
-          convertFirstBorder
-          convertRounded
-        fi
-
-        if [ "${convert_shadow}" == "yes" ]; then
-          convertShadow
-        fi
-
-        if [ "${convert_second_border}" == "yes" ]; then
-          convertSecondBorder
-        fi
-      
-        if [ "${convert_footer}" == "yes" ]; then
-          convertFooter
-        fi
-
-        termux-media-scan "${file_name}" &> /dev/null
-        termux-toast -b "${hex_color[0]}" -c "${hex_color[1]}" -g top "${file_name##*/} ✅"
-        termux-notification --action "termux-open '${file_name}'" --icon "camera_enhance" \
-        --image-path "${file_name}" --priority "high" --title "📸 Awesomeshot v${version}"
-
+        run
 
         if [ "${open_image}" == "yes" ]; then
           termux-open "${file_name}"
@@ -325,46 +326,7 @@ function manualRun() {
   if [ -f ${file_name} ]; then
     check
 
-    if [ "${convert_to_png}" == "yes" ]; then
-      convertToPng
-    fi
-
-    if [ "${backup}" == "yes" ]; then
-      title "${COLOR_SKY}[+] BACKUP IMAGE${COLOR_DEFAULT}"
-      backupOriginalPhoto "${file_name}"
-    fi
-
-    title "${COLOR_SKY}[+] EDITING IMAGE${COLOR_DEFAULT}"
-      
-    if [ "${convert_titlebar}" == "yes" ]; then
-      convertTitleBar
-    fi
-
-    if [ "${convert_rounded}" == "yes" ]; then
-      convertRounded
-    fi
-
-    if [ "${convert_first_border}" == "yes" ]; then
-      convertFirstBorder
-      convertRounded
-    fi
-
-    if [ "${convert_shadow}" == "yes" ]; then
-      convertShadow
-    fi
-
-    if [ "${convert_second_border}" == "yes" ]; then
-      convertSecondBorder
-    fi
-
-    if [ "${convert_footer}" == "yes" ]; then
-      convertFooter
-    fi
-
-    termux-media-scan "${file_name}" &> /dev/null
-    termux-toast -b "${hex_color[0]}" -c "${hex_color[1]}" -g top "${file_name} ✅"
-    termux-notification --action "termux-open '${file_name}'" --icon "camera_enhance" \
-    --image-path "${file_name}" --priority "high" --title "📸 Awesomeshot v${version}"
+    run
 
     setterm -cursor on
 
@@ -696,11 +658,10 @@ function version() {
   echo -e "awesomeshot v.${version}"
 }
 
-
+Mode=
 getUserConfig
 
 while test $# -gt 0; do
-  echo $@
   case "${1}" in
     -a|--auto )
       Mode="auto"
@@ -795,31 +756,52 @@ while test $# -gt 0; do
       convert_rounded="no"
       shift
     ;;
-    -d|--border )
+    -d1|--border-1 )
       shift
       border_options=("--color" "--size")
-      if test $# -gt 0; then
+      if test $# -gt 1; then
         while [[ "${border_options[*]}" =~ (^|[[:space:]])$1($|[[:space:]]) ]]; do
           if [[ $1 == "--color" ]]; then
-            border_color=$2
+            first_border_color=$2
             shift 2
           fi
           if [[ $1 == "--size" ]]; then
-            border_size=$2
+            first_border_size=$2
             shift 2
           fi
         done
       fi
-      convert_border="yes"
+      convert_first_border="yes"
     ;;  
-    -D|--disable-border )
-      convert_border="no"
+    -D1|--disable-border-1 )
+      convert_first_border="no"
+      shift
+    ;;
+    -d2|--border-2 )
+      shift
+      border_options=("--color" "--size")
+      if test $# -gt 1; then
+        while [[ "${border_options[*]}" =~ (^|[[:space:]])$1($|[[:space:]]) ]]; do
+          if [[ $1 == "--color" ]]; then
+            second_border_color=$2
+            shift 2
+          fi
+          if [[ $1 == "--size" ]]; then
+            second_border_size=$2
+            shift 2
+          fi
+        done
+      fi
+      convert_second_border="yes"
+    ;;  
+    -D2|--disable-border-2 )
+      convert_second_border="no"
       shift
     ;;
     -s|--shadow )
       shift
       shadow_options=("--color" "--size")
-      if test $# -gt 0; then
+      if test $# -gt 1; then
         while [[ "${shadow_options[*]}" =~ (^|[[:space:]])$1($|[[:space:]]) ]]; do
           if [[ $1 == "--color" ]]; then
             shadow_color=$2
@@ -840,7 +822,7 @@ while test $# -gt 0; do
     -f|--footer )
       shift
       footer_options=("--text" "--font" "--position" "--xy" "--font-size" "--color" "--background")
-      if test $# -gt 0; then
+      if test $# -gt 1; then
         while [[ "${footer_options[*]}" =~ (^|[[:space:]])$1($|[[:space:]]) ]]; do
           if [[ $1 == "--text" ]]; then
             footer_text=$2
