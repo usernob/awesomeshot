@@ -551,10 +551,10 @@ function convertSecondBorder() {
   x=$(($width_img * $second_border_size / 100))
   y=$(($height_img * $second_border_size / 100))
   convert \
-    \( -size "$(($width_img + x))"x"$(($height_img + y))" -define gradient:angle=${color[2]} gradient:${color[0]}-${color[1]} \) \
     $file_name \
+    \( -size "$(($width_img + x))"x"$(($height_img + y))" -define gradient:angle=${color[2]} gradient:${color[0]}-${color[1]} \) \
     -gravity center \
-    -compose over -composite \
+    -compose Dst_Over -composite \
     $file_name
   # convert "$file_name" -bordercolor "${second_border_color}" -border ${second_border_size} "$file_name"
   check
