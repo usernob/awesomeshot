@@ -63,15 +63,15 @@ add_on_img=""
 # NOTE (Bug Found):
 # - Sometimes the title bar result is too big or too small
 #
-# width_img=$(magick ${file_name} - format "%w" info:)
-# height_img=$(magick ${file_name} - format "%h" info:)
-# if (( ${width_img} > ${height_img} )); then
-#   height_img=${width_img}
-# elif (( ${width_img} < ${height_img} )); then
-#   width_img=${height_img}
-# fi
-width_img=500
-height_img=1000
+width_img=$(magick ${file_name} - format "%w" info:)
+height_img=$(magick ${file_name} - format "%h" info:)
+if (( ${width_img} > ${height_img} )); then
+  height_img=${width_img}
+elif (( ${width_img} < ${height_img} )); then
+  width_img=${height_img}
+fi
+# width_img=500
+# height_img=1000
 
 # This variable serves to set titlebar color, if you want to custom the color, you can
 # change this value with hex color or use the one in the array list.
@@ -532,8 +532,31 @@ function convertShadow() {
 
 function convertSecondBorder() {
   subtitle "[+]*Set*Image*Second*Border*Color*"
-
-  convert "$file_name" -bordercolor "${second_border_color}" -border ${second_border_size} "$file_name"
+  color=(
+    $second_border_color 
+    $second_border_color 
+    45
+  )
+  for i in {1..3}; do
+    n=$(echo $second_border_color | sed -E "s/^(.*)-([^;.\n]*);?(.*)/\\${i}/gm" )
+    echo $i
+    echo $n
+    if [[ $n != "" ]]; then
+      color[$(($i - 1))]=$n
+    fi
+    echo ${color[@]}
+  done
+  width_img=$(magick ${file_name} -format "%w" info:)
+  height_img=$(magick ${file_name} -format "%h" info:)
+  x=$(($width_img * $second_border_size / 100))
+  y=$(($height_img * $second_border_size / 100))
+  convert \
+    \( -size "$(($width_img + x))"x"$(($height_img + y))" -define gradient:angle=${color[2]} gradient:${color[0]}-${color[1]} \) \
+    $file_name \
+    -gravity center \
+    -compose over -composite \
+    $file_name
+  # convert "$file_name" -bordercolor "${second_border_color}" -border ${second_border_size} "$file_name"
   check
 }
 
@@ -954,6 +977,10 @@ while test $# -gt 0; do
           fi
         done
       fi
+    ;;
+    -F|--no-footer )
+      convert_footer="no"
+      shift
     ;;
     *)
       echo ""
